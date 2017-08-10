@@ -1,5 +1,5 @@
 var webpack = require('webpack');
-var webpackConfig = require('./build/webpack.dev.conf.js');
+var webpackConfig = require('../../build/webpack.dev.conf.js');
 
 module.exports = function (app) {
     var compiler = webpack(webpackConfig);

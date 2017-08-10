@@ -1,5 +1,5 @@
 var path = require('path');
-var config = require('../config');
+var config = require('../feconfig');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 exports.assetsPath = function (_path) {
@@ -71,4 +71,69 @@ exports.styleLoaders = function (options) {
         })
     }
     return output;
+}
+
+// 生成 webpack entry
+exports.generateMultiEntry = function (nameList) {
+    var entry = {};
+    nameList.forEach(function (name) {
+        entry[name] = ['./views/pages/' + name + '/main.js' ];
+    });
+
+    return entry;
+}
+
+// 为 dev 配置 HtmlWebpackPlugin 生成多页面 html
+exports.generateDevHtmls = function (isSingle, nameList) {
+    if (isSingle) {
+        return [{
+            filename: 'index.html',
+            template: 'index.html',
+            inject: true
+        }];
+    }
+
+    return nameList.map(function (name) {
+        return {
+            filename: name + '.html',
+            template: 'views/index.html',
+            chunks: [ name ],
+            inject: true
+        }
+    });
+}
+
+// 为 build 配置 HtmlWebpackPlugin 生成多页面 html
+exports.generateBuildHtmls = function (isSingle, nameList) {
+    if (isSingle) {
+        return [{
+            filename: config.index,
+            template: 'views/index.html',
+            inject: true,
+            minify: {
+                removeComments: true,
+                collapseWhitespace: true,
+                removeAttributeQuotes: true
+                // more options:
+                // https://github.com/kangax/html-minifier#options-quick-reference
+            },
+            // necessary to consistently work with multiple chunks via CommonsChunkPlugin
+            chunksSortMode: 'dependency'
+        }];
+    }
+
+    return nameList.map(function (name) {
+        return {
+            filename: path.resolve(__dirname, '../dist/' + name + '.html'),
+            template: 'views/index.html',
+            inject: true,
+            chunks: [ name, 'vendor', 'manifest' ],
+            minify: {
+                removeComments: true,
+                collapseWhitespace: true,
+                removeAttributeQuotes: true
+            },
+            chunksSortMode: 'dependency'
+        };
+    });
 }

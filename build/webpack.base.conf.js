@@ -1,16 +1,16 @@
 var path = require('path')
 var utils = require('./utils')
-var config = require('../config')
+var config = require('../feconfig')
 var vueLoaderConfig = require('./vue-loader.conf')
 
 function resolve(dir) {
     return path.join(__dirname, '..', dir)
 }
 
+let entry = utils.generateMultiEntry(config.multiPage);
+
 module.exports = {
-    entry: {
-        app: './views/main.js'
-    },
+    entry: entry,
     output: {
         path: config.build.assetsRoot,
         filename: '[name].js',
