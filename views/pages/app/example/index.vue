@@ -2,7 +2,7 @@
     <div class="example">
         <el-breadcrumb separator="/">
             <el-breadcrumb-item>主页</el-breadcrumb-item>
-            <el-breadcrumb-item>测试</el-breadcrumb-item>
+            <el-breadcrumb-item>测试页面</el-breadcrumb-item>
         </el-breadcrumb>
 
         <div class="ct-page">

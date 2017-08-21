@@ -30,7 +30,7 @@ module.exports = {
                 test: /\.(js|vue)$/,
                 loader: 'eslint-loader',
                 enforce: 'pre',
-                include: [resolve('src')],
+                include: [resolve('views')],
                 options: {
                     formatter: require('eslint-friendly-formatter')
                 }
@@ -43,7 +43,7 @@ module.exports = {
             {
                 test: /\.js$/,
                 loader: 'babel-loader',
-                include: [resolve('src')]
+                include: [resolve('views')]
             },
             {
                 test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
