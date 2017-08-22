@@ -8,6 +8,7 @@ var CopyWebpackPlugin = require('copy-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin');
+var ParallelUglifyPlugin = require('webpack-parallel-uglify-plugin');
 
 var htmlWebpackPlugins = utils.generateBuildHtmls(false, config.multiPage).map(function (config) {
     return new HtmlWebpackPlugin(config);
@@ -32,11 +33,22 @@ var webpackConfig = merge(baseWebpackConfig, {
         new webpack.DefinePlugin({
             'process.env': env
         }),
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                warnings: false
-            },
-            sourceMap: true
+        // new webpack.optimize.UglifyJsPlugin({
+        //     compress: {
+        //         warnings: false
+        //     },
+        //     sourceMap: true
+        // }),
+        new ParallelUglifyPlugin({
+            cacheDir: '.cache/',
+            uglifyJS:{
+                output: {
+                    comments: false
+                },
+                compress: {
+                    warnings: false
+                }
+            }
         }),
         // extract css into its own file
         new ExtractTextPlugin({

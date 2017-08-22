@@ -1,13 +1,28 @@
-var path = require('path')
-var utils = require('./utils')
-var config = require('../feconfig')
-var vueLoaderConfig = require('./vue-loader.conf')
+var webpack = require('webpack');
+var path = require('path');
+var HappyPack = require('happypack');
+var os = require('os');
+var happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length });
+var utils = require('./utils');
+var config = require('../feconfig');
+var ProgressBarPlugin = require('progress-bar-webpack-plugin')
+var vueLoaderConfig = require('./vue-loader.conf');
 
 function resolve(dir) {
     return path.join(__dirname, '..', dir)
 }
 
 let entry = utils.generateMultiEntry(config.multiPage);
+
+function createHappyPlugin(id, loaders) {
+    return new HappyPack({
+        id: id,
+        loaders: loaders,
+        threadPool: happyThreadPool,
+        // make happy more verbose with HAPPY_VERBOSE=1
+        verbose: process.env.HAPPY_VERBOSE === '1'
+    })
+}
 
 module.exports = {
     entry: entry,
@@ -26,7 +41,9 @@ module.exports = {
         }
     },
     module: {
-        rules: [{
+        noParse: /node_modules\/(element-ui\.js)/,
+        rules: [
+            {
                 test: /\.(js|vue)$/,
                 loader: 'eslint-loader',
                 enforce: 'pre',
@@ -42,7 +59,8 @@ module.exports = {
             },
             {
                 test: /\.js$/,
-                loader: 'babel-loader',
+                loader: 'happypack/loader?id=happy-babel-js',
+                exclude: /node_modules/,
                 include: [resolve('views')]
             },
             {
@@ -70,5 +88,28 @@ module.exports = {
                 }
             }
         ]
-    }
+    },
+    plugins: [
+        new ProgressBarPlugin({
+            format: '  build [:bar] :percent (:elapsed seconds)'
+        }),
+        new webpack.DllReferencePlugin({
+            context: path.resolve(__dirname, '..'),
+            manifest: require('./vendor-manifest.json')
+        }),
+        createHappyPlugin('happy-babel-js', ['babel-loader?cacheDirectory=true']),
+        createHappyPlugin('happy-babel-vue', ['babel-loader?cacheDirectory=true']),
+        createHappyPlugin('happy-css', ['css-loader', 'vue-style-loader']),
+        // https://github.com/amireh/happypack/pull/131
+        new HappyPack({
+            loaders: [{
+                path: 'vue-loader',
+                query: {
+                    loaders: {
+                        less: 'vue-style-loader!css-loader!less-loader?indentedSyntax'
+                    }
+                }
+            }]
+        })
+    ]
 }

@@ -38,3 +38,11 @@ npm run start
 
 可以看到 `localhost:3000` 能够访问到express所构建的项目，使用 jade 作为模版，现在要把它视图层一步步变为 vue 。
 
+
+## webpack优化
+
+happypack + webpack-dllplugins。还有ParallelUglifyPlugin，webpack升级为3等一些优化
+
+* https://segmentfault.com/a/1190000010045690
+* http://jeffjade.com/2017/08/12/125-webpack-package-optimization-for-speed/
+* https://github.com/everlose/vue-boilerplate-template
